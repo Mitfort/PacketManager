@@ -1,5 +1,6 @@
 import sys
 import time
+from pathlib import Path
 from parser import Repozytorium, Requirement
 from bazawiedzy import BazaWiedzy, weryfikujStan
 
@@ -13,38 +14,38 @@ def wczytaj_zadania(sciezka_do_pliku):
                     continue
                 zadania.append(linia)
     except FileNotFoundError:
-        print(f"Błąd: Nie znaleziono pliku żądań '{sciezka_do_pliku}'")
-        sys.exit(1)
+        return None
     return zadania
 
-def main():
-    if len(sys.argv) < 3:
-        print("Użycie: python main.py <ścieżka_do_repo.json> <ścieżka_do_zadań.txt>")
-        sys.exit(1)
+def uruchom_test_dla_rozmiaru(katalog_k05, rozmiar):
+    sciezka_repo = katalog_k05 / f"repo_{rozmiar}.json"
+    
+    sciezka_zadan = katalog_k05 / f"requests_{rozmiar}.txt"
+    if not sciezka_zadan.exists():
+        sciezka_zadan = katalog_k05 / f"requests_{rozmiar}.json"
 
-    plik_repo = sys.argv[1]
-    plik_zadan = sys.argv[2]
-
+    if not sciezka_repo.exists() or not sciezka_zadan.exists():
+        print(f"| {rozmiar:<10} | Pominięto (brak pliku repo_{rozmiar}.json lub requests_{rozmiar}) |")
+        return
     try:
-        with open(plik_repo, 'r', encoding='utf-8') as f:
+        with open(sciezka_repo, 'r', encoding='utf-8') as f:
             zawartosc_json = f.read()
-    except FileNotFoundError:
-        print(f"Błąd: Nie znaleziono pliku repozytorium '{plik_repo}'")
-        sys.exit(1)
+    except Exception as e:
+        print(f"| {rozmiar:<10} | Błąd odczytu repo: {e} |")
+        return
 
-    zadania = wczytaj_zadania(plik_zadan)
-
-    print(f"=== Uruchamianie menedżera pakietów ===")
-    print(f"Repozytorium: {plik_repo}")
-    print(f"Plik żądań:  {plik_zadan}\n")
+    zadania = wczytaj_zadania(sciezka_zadan)
+    if zadania is None:
+        print(f"| {rozmiar:<10} | Błąd odczytu żądań |")
+        return
 
     t0 = time.time()
     try:
         repo = Repozytorium(zawartosc_json)
         baza_wiedzy = BazaWiedzy(repo)
     except Exception as e:
-        print(f"Błąd walidacji / tworzenia bazy wiedzy:\n{e}")
-        sys.exit(1)
+        print(f"| {rozmiar:<10} | Błąd Bazy Wiedzy: {e} |")
+        return
     t1 = time.time()
     czas_budowy = t1 - t0
 
@@ -52,24 +53,29 @@ def main():
     wynik = baza_wiedzy.instaluj(zadania)
     t3 = time.time()
     czas_solvera = t3 - t2
-    print(f"Czas budowy bazy wiedzy: {czas_budowy:.4f} s")
-    print(f"Czas rozwiązywania (Z3): {czas_solvera:.4f} s\n")
 
     if isinstance(wynik, list):
-        print(" Wynik instalacji:")
-        for p in wynik:
-            print(f"  - {p}")
-        print(f"\nLiczba zainstalowanych pakietów: {len(wynik)}\n")
-        stan_do_weryfikacji = {}
-        for wpis in wynik:
-            nazwa, wersja_str = wpis.split()
-            krotka_wersji = tuple(int(x) for x in wersja_str.split('.'))
-            stan_do_weryfikacji[nazwa] = krotka_wersji
-
-        print("--- Uruchamianie niezależnego weryfikatora ---")
-        weryfikujStan(repo, stan_do_weryfikacji)
+        status = f"OK ({len(wynik)} pakietów)"
     else:
-        print(f"Wynik: {wynik}")
+        status = str(wynik)
+
+    print(f"| N={rozmiar:<8} | {czas_budowy:12.4f} s | {czas_solvera:13.4f} s | {status:<20} |")
+
+def main():
+    sciezka_src = Path(__file__).resolve().parent
+    katalog_k05 = sciezka_src.parent / "repos" / "k05"
+
+    rozmiary = [10, 30, 100, 200, 300, 1000]
+
+    print("=== PĘTLA TESTOWA W K05 (N = 10, 30, 100, 200, 300, 1000) ===")
+    print(f"Katalog: {katalog_k05}\n")
+    print(f"| {'Rozmiar':<10} | {'Czas budowy':<14} | {'Czas Z3':<15} | {'Wynik':<20} |")
+    print("-" * 70)
+
+    for r in rozmiary:
+        uruchom_test_dla_rozmiaru(katalog_k05, r)
+
+    print("-" * 70)
 
 if __name__ == "__main__":
     main()
