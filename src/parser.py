@@ -128,3 +128,13 @@ class Requirement:
 
 
         return {"package": nazwa_pakietu, "constraints": ograniczenia}
+
+
+    def _normalizuj_nazwe(self, nazwa):
+        return nazwa.replace('_', '-').replace('.', '-').lower()
+
+    def _normalizuj_wersje(self, wersja_str):
+        czesci = [int(x) for x in wersja_str.split('.')]
+        while len(czesci) > 1 and czesci[-1] == 0:
+            czesci.pop()
+        return tuple(czesci)
