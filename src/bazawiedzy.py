@@ -9,9 +9,25 @@ class BazaWiedzy:
         self.vars = {}
 
         self._utworz_zmienne()
+        self._wypisz_ostrzezenia_o_pustych_wymaganiach()
         self.dodajAksjomatA1()
         self.dodajAksjomatA2()
         self.dodajAksjomatA3()
+
+
+    def _wypisz_ostrzezenia_o_pustych_wymaganiach(self):
+        for nazwa_pakietu, pakiet in self.repo.packages.items():
+            for wer_krotka, wersja_obj in pakiet.versions.items():
+                # Sprawdzamy wszystkie wymagania i konflikty
+                for wym in wersja_obj.requirements + wersja_obj.conflicts:
+                    czy_ma_pasujace = Jakiekolwiek_pasujace = False
+                    for alt in wym.alternatives:
+                        if self._znajdz_pasujace_zmienne(alt):
+                            czy_ma_pasujace = True
+                            break
+                    if not czy_ma_pasujace:
+                        wer_str = '.'.join(map(str, wer_krotka))
+                        print(f"Ostrzeżenie: W {nazwa_pakietu}=={wer_str} wymóg '{wym.path}' wskazuje na nieistniejący pakiet/wersję.")
 
     def _utworz_zmienne(self):
         for nazwa_pakietu, pakiet in self.repo.packages.items():
@@ -22,34 +38,35 @@ class BazaWiedzy:
 
     def dodajAksjomatA1(self):
         for nazwa_pakietu, pakiet in self.repo.packages.items():
-            zmienne_wersje = [self.vars[(nazwa_pakietu, wer_krotka)] for wer_krotka in pakiet.versions.keys()]
-            self.opt.add(z3.AtMost(*zmienne_wersje, 1))
+            zmienne_wersje = [self.vars[(nazwa_pakietu, w)] for w in pakiet.versions.keys()]
+            etykieta = z3.Bool(f"(A1) Pakiet '{nazwa_pakietu}' ma max 1 wersję")
+            self.opt.assert_and_track(z3.AtMost(*zmienne_wersje, 1), etykieta)
 
     def dodajAksjomatA2(self):
         for (nazwa_pakietu, wer_krotka), zmienna_z3 in self.vars.items():
             wersja_obj = self.repo.packages[nazwa_pakietu].versions[wer_krotka]
-
+            wer_str = '.'.join(map(str, wer_krotka))
+            
             for wymaganie in wersja_obj.requirements:
                 opcje_z3 = []
-
                 for alternatywa in wymaganie.alternatives:
-                    pasujace_zmienne = self._znajdz_pasujace_zmienne(alternatywa)
-                    opcje_z3.extend(pasujace_zmienne)
+                    opcje_z3.extend(self._znajdz_pasujace_zmienne(alternatywa))
 
-                if opcje_z3:
-                    self.opt.add(z3.Implies(zmienna_z3, z3.Or(opcje_z3)))
-                else:
-                    self.opt.add(z3.Implies(zmienna_z3, z3.BoolVal(False)))
+                warunek = z3.Or(opcje_z3) if opcje_z3 else z3.BoolVal(False)
+                etykieta = z3.Bool(f"(A2) Zależność: {nazwa_pakietu}=={wer_str} wymaga {wymaganie.path}")
+                self.opt.assert_and_track(z3.Implies(zmienna_z3, warunek), etykieta)
 
     def dodajAksjomatA3(self):
         for (nazwa_pakietu, wer_krotka), zmienna_z3 in self.vars.items():
             wersja_obj = self.repo.packages[nazwa_pakietu].versions[wer_krotka]
+            wer_str = '.'.join(map(str, wer_krotka))
 
             for konflikt in wersja_obj.conflicts:
                 for alternatywa in konflikt.alternatives:
                     pasujace_zmienne = self._znajdz_pasujace_zmienne(alternatywa)
                     for konfliktujaca_zmienna in pasujace_zmienne:
-                        self.opt.add(z3.Implies(zmienna_z3, z3.Not(konfliktujaca_zmienna)))
+                        etykieta = z3.Bool(f"(A3) Konflikt: {nazwa_pakietu}=={wer_str} wyklucza się z {konflikt.path}")
+                        self.opt.assert_and_track(z3.Implies(zmienna_z3, z3.Not(konfliktujaca_zmienna)), etykieta)
 
     def _znajdz_pasujace_zmienne(self, alternatywa):
         nazwa_pakietu = alternatywa["package"]

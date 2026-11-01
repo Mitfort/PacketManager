@@ -3,7 +3,11 @@ import re
 
 class Repozytorium:
     def __init__(self, json_string):
-        dane = json.loads(json_string, object_pairs_hook=self._rygorystyczny_parser)
+        try:
+            dane = json.loads(json_string, object_pairs_hook=self._rygorystyczny_parser)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Błąd składni JSON w linii {e.lineno}, kolumnie {e.colno}: {e.msg}")
+            
         self._waliduj_klucze(dane)
         self.packages = {}
         
