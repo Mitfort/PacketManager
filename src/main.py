@@ -1,8 +1,8 @@
 import sys
 import time
 from pathlib import Path
-from parser import Repozytorium, Requirement
-from bazawiedzy import BazaWiedzy, weryfikujStan
+from src.parser import Repozytorium, Requirement
+from src.bazawiedzy import BazaWiedzy, weryfikujStan
 
 def wczytaj_zadania(sciezka_do_pliku):
     zadania = []

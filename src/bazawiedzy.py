@@ -1,5 +1,5 @@
 import z3
-from parser import Requirement
+from src.parser import Requirement
 
 class BazaWiedzy:
     def __init__(self, repository):
