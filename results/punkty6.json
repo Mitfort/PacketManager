@@ -1,0 +1,679 @@
+{
+  "grupa": "k05",
+  "ziarno": 2026,
+  "python": "3.11.9",
+  "z3": "5.3.2",
+  "instalacje": [
+    {
+      "N": 10,
+      "wersje": 52,
+      "aksjomaty": 31,
+      "zadania": [
+        "cffi",
+        "attrs",
+        "falcon-tools"
+      ],
+      "budowa_s": 0.004669399990234524,
+      "rozwiazanie_s": 0.01216840004781261,
+      "ostrzezenia": 4,
+      "pakiety": 5,
+      "przestarzalosc": 2,
+      "weryfikacja": "OK",
+      "wyjasnienie": []
+    },
+    {
+      "N": 30,
+      "wersje": 171,
+      "aksjomaty": 99,
+      "zadania": [
+        "multidict",
+        "anyio",
+        "basalt-core"
+      ],
+      "budowa_s": 0.011015500000212342,
+      "rozwiazanie_s": 0.017882499960251153,
+      "ostrzezenia": 0,
+      "pakiety": null,
+      "przestarzalosc": null,
+      "weryfikacja": "nie dotyczy (UNSAT)",
+      "wyjasnienie": [
+        "(A1) Pakiet 'alder-tools' ma max 1 wersję",
+        "(A2) basalt-core==1 wymaga prism-compat (packages['basalt-core'].versions['1.0'].requires[0])",
+        "(A2) basalt-core==2 wymaga nova-io (packages['basalt-core'].versions['2.0'].requires[0])",
+        "(A2) basalt-core==2 wymaga thistle-cli (packages['basalt-core'].versions['2.0'].requires[1])",
+        "(A2) nova-io==1 wymaga alder-tools ==1.0 (packages['nova-io'].versions['1.0'].requires[0])",
+        "(A2) nova-io==1.1 wymaga alder-tools<2 (packages['nova-io'].versions['1.1'].requires[0])",
+        "(A2) thistle-cli==1 wymaga alder-tools >=2.0 (packages['thistle-cli'].versions['1.0'].requires[0])",
+        "(A3) prism-compat==1 wyklucza basalt-core==1 (packages['prism-compat'].versions['1.0'].conflicts[0])",
+        "Żądanie: basalt-core"
+      ]
+    },
+    {
+      "N": 100,
+      "wersje": 1285,
+      "aksjomaty": 1193,
+      "zadania": [
+        "multidict",
+        "markupsafe-willow",
+        "krypton-io"
+      ],
+      "budowa_s": 0.2212895000120625,
+      "rozwiazanie_s": 0.16836529999272898,
+      "ostrzezenia": 93,
+      "pakiety": 6,
+      "przestarzalosc": 0,
+      "weryfikacja": "OK",
+      "wyjasnienie": []
+    },
+    {
+      "N": 300,
+      "wersje": 6705,
+      "aksjomaty": 6106,
+      "zadania": [
+        "httpx",
+        "importlib-metadata-indigo",
+        "prism-api"
+      ],
+      "budowa_s": 1.8470385000109673,
+      "rozwiazanie_s": 1.07769849995384,
+      "ostrzezenia": 206,
+      "pakiety": 11,
+      "przestarzalosc": 1,
+      "weryfikacja": "OK",
+      "wyjasnienie": []
+    },
+    {
+      "N": 1000,
+      "wersje": 20896,
+      "aksjomaty": 15524,
+      "zadania": [
+        "packaging",
+        "chardet-heron",
+        "juniper-core"
+      ],
+      "budowa_s": 4.308280500001274,
+      "rozwiazanie_s": 3.542005600000266,
+      "ostrzezenia": 552,
+      "pakiety": 4,
+      "przestarzalosc": 34,
+      "weryfikacja": "OK",
+      "wyjasnienie": []
+    }
+  ],
+  "scenariusz": [
+    {
+      "krok": 1,
+      "operacja": "install",
+      "zadanie": "wcwidth-falcon",
+      "wynik": "OK",
+      "liczba_zmian": 1,
+      "zmiany": [
+        "Instalacja: wcwidth-falcon 0.9.2"
+      ],
+      "pakiety": 1,
+      "reczne": 1,
+      "czas_s": 0.7392118999850936,
+      "weryfikacja": "OK",
+      "stan": {
+        "wcwidth-falcon": {
+          "wersja": [
+            0,
+            9,
+            2
+          ],
+          "manual": true
+        }
+      }
+    },
+    {
+      "krok": 2,
+      "operacja": "remove",
+      "zadanie": "wcwidth-falcon",
+      "wynik": "OK",
+      "liczba_zmian": 1,
+      "zmiany": [
+        "Usunięcie: wcwidth-falcon 0.9.2"
+      ],
+      "pakiety": 0,
+      "reczne": 0,
+      "czas_s": 0.32657759997528046,
+      "weryfikacja": "OK",
+      "stan": {}
+    },
+    {
+      "krok": 3,
+      "operacja": "install",
+      "zadanie": "hyperframe",
+      "wynik": "OK",
+      "liczba_zmian": 1,
+      "zmiany": [
+        "Instalacja: hyperframe 6.1"
+      ],
+      "pakiety": 1,
+      "reczne": 1,
+      "czas_s": 0.8140649999841116,
+      "weryfikacja": "OK",
+      "stan": {
+        "hyperframe": {
+          "wersja": [
+            6,
+            1
+          ],
+          "manual": true
+        }
+      }
+    },
+    {
+      "krok": 4,
+      "operacja": "autoremove",
+      "zadanie": "hyperframe",
+      "wynik": "OK",
+      "liczba_zmian": 1,
+      "zmiany": [
+        "Usunięcie: hyperframe 6.1"
+      ],
+      "pakiety": 0,
+      "reczne": 0,
+      "czas_s": 0.3352705000434071,
+      "weryfikacja": "OK",
+      "stan": {}
+    },
+    {
+      "krok": 5,
+      "operacja": "install",
+      "zadanie": "referencing-falcon",
+      "wynik": "OK",
+      "liczba_zmian": 4,
+      "zmiany": [
+        "Instalacja: attrs-falcon 26.1",
+        "Instalacja: referencing-falcon 0.37",
+        "Instalacja: rpds-py-falcon 2026.9.1",
+        "Instalacja: typing-extensions 4.16"
+      ],
+      "pakiety": 4,
+      "reczne": 1,
+      "czas_s": 0.8124125999747775,
+      "weryfikacja": "OK",
+      "stan": {
+        "attrs-falcon": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": false
+        },
+        "referencing-falcon": {
+          "wersja": [
+            0,
+            37
+          ],
+          "manual": true
+        },
+        "rpds-py-falcon": {
+          "wersja": [
+            2026,
+            9,
+            1
+          ],
+          "manual": false
+        },
+        "typing-extensions": {
+          "wersja": [
+            4,
+            16
+          ],
+          "manual": false
+        }
+      }
+    },
+    {
+      "krok": 6,
+      "operacja": "install",
+      "zadanie": "attrs-krypton",
+      "wynik": "OK",
+      "liczba_zmian": 1,
+      "zmiany": [
+        "Instalacja: attrs-krypton 26.1"
+      ],
+      "pakiety": 5,
+      "reczne": 2,
+      "czas_s": 0.7491325999726541,
+      "weryfikacja": "OK",
+      "stan": {
+        "attrs-falcon": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": false
+        },
+        "attrs-krypton": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": true
+        },
+        "referencing-falcon": {
+          "wersja": [
+            0,
+            37
+          ],
+          "manual": true
+        },
+        "rpds-py-falcon": {
+          "wersja": [
+            2026,
+            9,
+            1
+          ],
+          "manual": false
+        },
+        "typing-extensions": {
+          "wersja": [
+            4,
+            16
+          ],
+          "manual": false
+        }
+      }
+    },
+    {
+      "krok": 7,
+      "operacja": "autoremove",
+      "zadanie": "attrs-falcon",
+      "wynik": "OK",
+      "liczba_zmian": 4,
+      "zmiany": [
+        "Instalacja: attrs 25.2",
+        "Usunięcie: attrs-falcon 26.1",
+        "Obniżenie wersji: referencing-falcon 0.37 -> 0.27.4",
+        "Usunięcie: typing-extensions 4.16"
+      ],
+      "pakiety": 4,
+      "reczne": 2,
+      "czas_s": 0.37398059997940436,
+      "weryfikacja": "OK",
+      "stan": {
+        "attrs": {
+          "wersja": [
+            25,
+            2
+          ],
+          "manual": false
+        },
+        "attrs-krypton": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": true
+        },
+        "referencing-falcon": {
+          "wersja": [
+            0,
+            27,
+            4
+          ],
+          "manual": true
+        },
+        "rpds-py-falcon": {
+          "wersja": [
+            2026,
+            9,
+            1
+          ],
+          "manual": false
+        }
+      }
+    },
+    {
+      "krok": 8,
+      "operacja": "autoremove",
+      "zadanie": "referencing-falcon",
+      "wynik": "OK",
+      "liczba_zmian": 3,
+      "zmiany": [
+        "Usunięcie: attrs 25.2",
+        "Usunięcie: referencing-falcon 0.27.4",
+        "Usunięcie: rpds-py-falcon 2026.9.1"
+      ],
+      "pakiety": 1,
+      "reczne": 1,
+      "czas_s": 0.3315763999707997,
+      "weryfikacja": "OK",
+      "stan": {
+        "attrs-krypton": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": true
+        }
+      }
+    },
+    {
+      "krok": 9,
+      "operacja": "install",
+      "zadanie": "cached-property",
+      "wynik": "OK",
+      "liczba_zmian": 1,
+      "zmiany": [
+        "Instalacja: cached-property 2.0.1"
+      ],
+      "pakiety": 2,
+      "reczne": 2,
+      "czas_s": 0.7929317000089213,
+      "weryfikacja": "OK",
+      "stan": {
+        "attrs-krypton": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": true
+        },
+        "cached-property": {
+          "wersja": [
+            2,
+            0,
+            1
+          ],
+          "manual": true
+        }
+      }
+    },
+    {
+      "krok": 10,
+      "operacja": "install",
+      "zadanie": "packaging",
+      "wynik": "OK",
+      "liczba_zmian": 1,
+      "zmiany": [
+        "Instalacja: packaging 26.3"
+      ],
+      "pakiety": 3,
+      "reczne": 3,
+      "czas_s": 0.7254865000140853,
+      "weryfikacja": "OK",
+      "stan": {
+        "attrs-krypton": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": true
+        },
+        "cached-property": {
+          "wersja": [
+            2,
+            0,
+            1
+          ],
+          "manual": true
+        },
+        "packaging": {
+          "wersja": [
+            26,
+            3
+          ],
+          "manual": true
+        }
+      }
+    },
+    {
+      "krok": 11,
+      "operacja": "install",
+      "zadanie": "aiohttp",
+      "wynik": "OK",
+      "liczba_zmian": 10,
+      "zmiany": [
+        "Instalacja: aiohappyeyeballs 2.7.1",
+        "Instalacja: aiohttp 3.14.5",
+        "Instalacja: aiosignal 1.4",
+        "Instalacja: attrs 26.1",
+        "Instalacja: frozenlist 1.8",
+        "Instalacja: idna 3.20",
+        "Instalacja: multidict 7.1",
+        "Instalacja: propcache 0.5.4",
+        "Instalacja: typing-extensions 4.16",
+        "Instalacja: yarl 1.25.1"
+      ],
+      "pakiety": 13,
+      "reczne": 4,
+      "czas_s": 0.766044799995143,
+      "weryfikacja": "OK",
+      "stan": {
+        "aiohappyeyeballs": {
+          "wersja": [
+            2,
+            7,
+            1
+          ],
+          "manual": false
+        },
+        "aiohttp": {
+          "wersja": [
+            3,
+            14,
+            5
+          ],
+          "manual": true
+        },
+        "aiosignal": {
+          "wersja": [
+            1,
+            4
+          ],
+          "manual": false
+        },
+        "attrs": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": false
+        },
+        "attrs-krypton": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": true
+        },
+        "cached-property": {
+          "wersja": [
+            2,
+            0,
+            1
+          ],
+          "manual": true
+        },
+        "frozenlist": {
+          "wersja": [
+            1,
+            8
+          ],
+          "manual": false
+        },
+        "idna": {
+          "wersja": [
+            3,
+            20
+          ],
+          "manual": false
+        },
+        "multidict": {
+          "wersja": [
+            7,
+            1
+          ],
+          "manual": false
+        },
+        "packaging": {
+          "wersja": [
+            26,
+            3
+          ],
+          "manual": true
+        },
+        "propcache": {
+          "wersja": [
+            0,
+            5,
+            4
+          ],
+          "manual": false
+        },
+        "typing-extensions": {
+          "wersja": [
+            4,
+            16
+          ],
+          "manual": false
+        },
+        "yarl": {
+          "wersja": [
+            1,
+            25,
+            1
+          ],
+          "manual": false
+        }
+      }
+    },
+    {
+      "krok": 12,
+      "operacja": "install",
+      "zadanie": "toml",
+      "wynik": "OK",
+      "liczba_zmian": 1,
+      "zmiany": [
+        "Instalacja: toml 0.10.2"
+      ],
+      "pakiety": 14,
+      "reczne": 5,
+      "czas_s": 0.7149137000087649,
+      "weryfikacja": "OK",
+      "stan": {
+        "aiohappyeyeballs": {
+          "wersja": [
+            2,
+            7,
+            1
+          ],
+          "manual": false
+        },
+        "aiohttp": {
+          "wersja": [
+            3,
+            14,
+            5
+          ],
+          "manual": true
+        },
+        "aiosignal": {
+          "wersja": [
+            1,
+            4
+          ],
+          "manual": false
+        },
+        "attrs": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": false
+        },
+        "attrs-krypton": {
+          "wersja": [
+            26,
+            1
+          ],
+          "manual": true
+        },
+        "cached-property": {
+          "wersja": [
+            2,
+            0,
+            1
+          ],
+          "manual": true
+        },
+        "frozenlist": {
+          "wersja": [
+            1,
+            8
+          ],
+          "manual": false
+        },
+        "idna": {
+          "wersja": [
+            3,
+            20
+          ],
+          "manual": false
+        },
+        "multidict": {
+          "wersja": [
+            7,
+            1
+          ],
+          "manual": false
+        },
+        "packaging": {
+          "wersja": [
+            26,
+            3
+          ],
+          "manual": true
+        },
+        "propcache": {
+          "wersja": [
+            0,
+            5,
+            4
+          ],
+          "manual": false
+        },
+        "toml": {
+          "wersja": [
+            0,
+            10,
+            2
+          ],
+          "manual": true
+        },
+        "typing-extensions": {
+          "wersja": [
+            4,
+            16
+          ],
+          "manual": false
+        },
+        "yarl": {
+          "wersja": [
+            1,
+            25,
+            1
+          ],
+          "manual": false
+        }
+      }
+    }
+  ],
+  "repo_200": {
+    "wersje": 4816,
+    "aksjomaty": 4446,
+    "budowa_s": 1.2572993999929167,
+    "ostrzezenia": 180
+  },
+  "wyjasnienie_przykladu": [
+    "(A1) Pakiet 'lib' ma max 1 wersję",
+    "(A2) app==2 wymaga lib >=2.0 (packages['app'].versions['2.0'].requires[0])",
+    "(A2) tool==1.1 wymaga lib <2.0 (packages['tool'].versions['1.1'].requires[0])",
+    "Żądanie: app==2.0",
+    "Żądanie: tool"
+  ]
+}

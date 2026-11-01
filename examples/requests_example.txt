@@ -1,0 +1,3 @@
+# Przykład sprzecznych żądań z zadania 6.3
+app==2.0
+tool

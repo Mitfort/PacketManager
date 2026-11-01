@@ -1,81 +1,77 @@
-import sys
-import time
+"""Jeden pełny przebieg projektu: python -m src.main."""
 from pathlib import Path
-from src.parser import Repozytorium, Requirement
-from src.bazawiedzy import BazaWiedzy, weryfikujStan
+from src.bazawiedzy import BazaWiedzy
+from src.eksperymenty import uruchom, zapisz_wyniki
+from src.parser import Repozytorium, wczytaj_zadania
+from src.stan import Stan
 
-def wczytaj_zadania(sciezka_do_pliku):
-    zadania = []
-    try:
-        with open(sciezka_do_pliku, 'r', encoding='utf-8') as f:
-            for linia in f:
-                linia = linia.strip()
-                if not linia or linia.startswith('#'):
-                    continue
-                zadania.append(linia)
-    except FileNotFoundError:
-        return None
-    return zadania
+def main(katalog_projektu: Path | None = None) -> None:
+    if katalog_projektu is None:
+        katalog_projektu = Path(__file__).resolve().parents[1]
 
-def uruchom_test_dla_rozmiaru(katalog_k05, rozmiar):
-    sciezka_repo = katalog_k05 / f"repo_{rozmiar}.json"
-    
-    sciezka_zadan = katalog_k05 / f"requests_{rozmiar}.txt"
-    if not sciezka_zadan.exists():
-        sciezka_zadan = katalog_k05 / f"requests_{rozmiar}.json"
+    katalog_repozytoriow = katalog_projektu / "repos" / "k05"
+    katalog_wynikow = katalog_projektu / "results"
+    katalog_przykladow = katalog_projektu / "examples"
+    katalog_wynikow.mkdir(parents=True, exist_ok=True)
 
-    if not sciezka_repo.exists() or not sciezka_zadan.exists():
-        print(f"| {rozmiar:<10} | Pominięto (brak pliku repo_{rozmiar}.json lub requests_{rozmiar}) |")
-        return
-    try:
-        with open(sciezka_repo, 'r', encoding='utf-8') as f:
-            zawartosc_json = f.read()
-    except Exception as e:
-        print(f"| {rozmiar:<10} | Błąd odczytu repo: {e} |")
-        return
+    print("\n=== Pełny przebieg projektu — grupa k05 ===\n")
 
-    zadania = wczytaj_zadania(sciezka_zadan)
-    if zadania is None:
-        print(f"| {rozmiar:<10} | Błąd odczytu żądań |")
-        return
+    repo = Repozytorium((katalog_przykladow / "repo_example.json").read_text(encoding="utf-8"))
+    baza = BazaWiedzy(repo)
+    stan = Stan.wczytaj(katalog_projektu / "state_example.txt")
 
-    t0 = time.time()
-    try:
-        repo = Repozytorium(zawartosc_json)
-        baza_wiedzy = BazaWiedzy(repo)
-    except Exception as e:
-        print(f"| {rozmiar:<10} | Błąd Bazy Wiedzy: {e} |")
-        return
-    t1 = time.time()
-    czas_budowy = t1 - t0
+    print("Stan początkowy:")
+    print(stan.tekst())
 
-    t2 = time.time()
-    wynik = baza_wiedzy.instaluj(zadania)
-    t3 = time.time()
-    czas_solvera = t3 - t2
+    print("--- Instalacja app==2.0 do istniejącego stanu ---\n")
+    zadania = wczytaj_zadania(katalog_przykladow / "install_app.txt")
+    wynik = baza.instaluj(zadania, stan)
+    _pokaz_i_zapisz(stan, wynik, katalog_wynikow / "example_install.txt")
 
-    if isinstance(wynik, list):
-        status = f"OK ({len(wynik)} pakietów)"
-    else:
-        status = str(wynik)
+    # Każdy wariant usuwania zaczyna od tego samego stanu, aby porównać wyniki.
+    przyklady_usuwania = [
+        ("Usunięcie lib", "remove_lib.txt", False, "example_remove_lib.txt"),
+        ("Usunięcie tool", "remove_tool.txt", False, "example_remove_tool.txt"),
+        ("Usunięcie tool z autoremove", "remove_tool.txt", True, "example_autoremove.txt"),
+    ]
 
-    print(f"| N={rozmiar:<8} | {czas_budowy:12.4f} s | {czas_solvera:13.4f} s | {status:<20} |")
+    for opis, plik_zadan, autoremove, plik_wyniku in przyklady_usuwania:
+        print(f"--- {opis} ---\n")
+        zadania = wczytaj_zadania(katalog_przykladow / plik_zadan, tylko_nazwy=True)
+        nazwy = [zadanie.alternatives[0]["package"] for zadanie in zadania]
 
-def main():
-    sciezka_src = Path(__file__).resolve().parent
-    katalog_k05 = sciezka_src.parent / "repos" / "k05"
+        wynik = baza.usun(nazwy, stan, autoremove=autoremove)
+        _pokaz_i_zapisz(stan, wynik, katalog_wynikow / plik_wyniku)
 
-    rozmiary = [10, 30, 100, 200, 300, 1000]
+    wyniki = uruchom(katalog_repozytoriow, ziarno=2026, kroki=12)
 
-    print("=== PĘTLA TESTOWA W K05 (N = 10, 30, 100, 200, 300, 1000) ===")
-    print(f"Katalog: {katalog_k05}\n")
-    print(f"| {'Rozmiar':<10} | {'Czas budowy':<14} | {'Czas Z3':<15} | {'Wynik':<20} |")
-    print("-" * 70)
+    print("\n--- Wyjaśnienie sprzeczności przykładowych żądań ---\n")
 
-    for r in rozmiary:
-        uruchom_test_dla_rozmiaru(katalog_k05, r)
+    for etykieta in wyniki["wyjasnienie_przykladu"]:
+        print(f"- {etykieta}")
 
-    print("-" * 70)
+    plik_danych = katalog_wynikow / "punkty6.json"
+    zapisz_wyniki(wyniki, plik_danych)
+
+    print(f"\nDane: {plik_danych}")
+    print(f"Raport: {plik_danych.with_suffix('.md')}\n")
+
+
+def _pokaz_i_zapisz(stan: Stan, wynik: Stan | None, sciezka: Path) -> None:
+    """Pokazuje plan i zapisuje wynik pojedynczej operacji przykładowej."""
+    if wynik is None:
+        raise RuntimeError(f"Przykład {sciezka.stem} nie ma rozwiązania")
+
+    print("Plan zmian:")
+
+    for zmiana in stan.plan(wynik):
+        print(f"- {zmiana}")
+
+    wynik.zapisz(sciezka)
+
+    print("\nStan po operacji:")
+    print(wynik.tekst())
+
 
 if __name__ == "__main__":
     main()
