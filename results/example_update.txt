@@ -1,0 +1,5 @@
+app 1 manual
+json-slow 1
+lib 1.5
+tool 1.1 manual
+util 2

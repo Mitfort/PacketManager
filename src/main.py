@@ -2,8 +2,10 @@
 from pathlib import Path
 from src.bazawiedzy import BazaWiedzy
 from src.eksperymenty import uruchom, zapisz_wyniki
-from src.parser import Repozytorium, wczytaj_zadania
+from src.manager import formatuj_punkt_pareto
+from src.parser import Repozytorium, formatuj_wersje, wczytaj_zadania
 from src.stan import Stan
+
 
 def main(katalog_projektu: Path | None = None) -> None:
     if katalog_projektu is None:
@@ -14,7 +16,7 @@ def main(katalog_projektu: Path | None = None) -> None:
     katalog_przykladow = katalog_projektu / "examples"
     katalog_wynikow.mkdir(parents=True, exist_ok=True)
 
-    print("\n=== Pełny przebieg projektu — grupa k05 ===\n")
+    print("\n=== Pełny przebieg projektu — grupa k05 (próg 8 punktów) ===\n")
 
     repo = Repozytorium((katalog_przykladow / "repo_example.json").read_text(encoding="utf-8"))
     baza = BazaWiedzy(repo)
@@ -28,7 +30,6 @@ def main(katalog_projektu: Path | None = None) -> None:
     wynik = baza.instaluj(zadania, stan)
     _pokaz_i_zapisz(stan, wynik, katalog_wynikow / "example_install.txt")
 
-    # Każdy wariant usuwania zaczyna od tego samego stanu, aby porównać wyniki.
     przyklady_usuwania = [
         ("Usunięcie lib", "remove_lib.txt", False, "example_remove_lib.txt"),
         ("Usunięcie tool", "remove_tool.txt", False, "example_remove_tool.txt"),
@@ -43,6 +44,28 @@ def main(katalog_projektu: Path | None = None) -> None:
         wynik = baza.usun(nazwy, stan, autoremove=autoremove)
         _pokaz_i_zapisz(stan, wynik, katalog_wynikow / plik_wyniku)
 
+    print("--- Aktualizacja wszystkich pakietów (zadanie 8.1) ---\n")
+    wynik_update = baza.aktualizuj(None, stan)
+    _pokaz_i_zapisz(stan, wynik_update, katalog_wynikow / "example_update.txt")
+
+    if "a" in repo.packages and "b" in repo.packages:
+        print("--- Konflikt aktualizacji i front Pareto dla a i b (zadanie 8.2) ---\n")
+        stan_ab = Stan({"a": (1,), "b": (1,)}, {"a", "b"})
+        analiza_ab = baza.analizuj_aktualizacje(None, stan_ab)
+        print(
+            "Najnowsze osiągalne osobno:",
+            ", ".join(f"{p} {formatuj_wersje(w)}" for p, w in analiza_ab["osiagalne"].items()),
+        )
+        print("Przyczyna konfliktu (unsat core):")
+        for etykieta in analiza_ab["wyjasnienie"]:
+            print(f"- {etykieta}")
+        print(
+            "Front Pareto:",
+            ", ".join(formatuj_punkt_pareto(p) for p in analiza_ab["front_pareto"]),
+        )
+        analiza_a = baza.analizuj_aktualizacje(["a"], stan_ab)
+        print("Aktualizacja samego a:", ", ".join(stan_ab.plan(analiza_a["wynik"])))
+
     wyniki = uruchom(katalog_repozytoriow, ziarno=2026, kroki=12)
 
     print("\n--- Wyjaśnienie sprzeczności przykładowych żądań ---\n")
@@ -50,11 +73,14 @@ def main(katalog_projektu: Path | None = None) -> None:
     for etykieta in wyniki["wyjasnienie_przykladu"]:
         print(f"- {etykieta}")
 
-    plik_danych = katalog_wynikow / "punkty6.json"
-    zapisz_wyniki(wyniki, plik_danych)
+    plik_danych_6 = katalog_wynikow / "punkty6.json"
+    zapisz_wyniki(wyniki, plik_danych_6)
 
-    print(f"\nDane: {plik_danych}")
-    print(f"Raport: {plik_danych.with_suffix('.md')}\n")
+    plik_danych_8 = katalog_wynikow / "punkty8.json"
+    zapisz_wyniki(wyniki, plik_danych_8)
+
+    print(f"\nDane: {plik_danych_8}")
+    print(f"Raport: {plik_danych_8.with_suffix('.md')}\n")
 
 
 def _pokaz_i_zapisz(stan: Stan, wynik: Stan | None, sciezka: Path) -> None:

@@ -1,13 +1,20 @@
 """Wyznaczanie sprzecznego rdzenia minimalnego względem zawierania."""
 import z3
-from src.bazawiedzy import BazaWiedzy
 from src.parser import Requirement
 
-def wyjasnij(baza: BazaWiedzy, zadania: list[Requirement]) -> list[str]:
+
+def wyjasnij(
+    baza,
+    zadania: list[Requirement],
+    dodatkowe_warunki: list[tuple[str, z3.ExprRef]] | None = None,
+) -> list[str]:
     aksjomaty = list(baza.aksjomaty)
 
     for zadanie in zadania:
         aksjomaty.append((f"Żądanie: {zadanie.tekst}", baza.formula_zadania(zadanie)))
+
+    if dodatkowe_warunki:
+        aksjomaty.extend(dodatkowe_warunki)
 
     solver = z3.Solver()
     znaczniki = [z3.FreshBool("rdzen") for _ in aksjomaty]

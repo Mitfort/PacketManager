@@ -1,5 +1,5 @@
 {
-  "meta": {"description": "Przykład odtworzony na podstawie fragmentu i wyników w projekt2.pdf"},
+  "meta": {"description": "Przykład odtworzony na podstawie fragmentu i wyników w projekt2.pdf + pakiety a i b do zadania 8.2"},
   "packages": {
     "app": {"versions": {
       "1.0": {"requires": ["lib >=1.0"]},
@@ -14,6 +14,19 @@
     "tool": {"versions": {"1.1": {"requires": ["lib <2.0", "json-fast | json-slow >=1.0"]}}},
     "json-fast": {"versions": {"1.0": {"requires": ["util"]}}},
     "json-slow": {"versions": {"1.0": {}}},
-    "legacy": {"versions": {"1.0": {"conflicts": ["util >=2.0"]}}}
+    "legacy": {"versions": {"1.0": {"conflicts": ["util >=2.0"]}}},
+    "a": {
+      "versions": {
+        "1.0": {},
+        "1.1": {"requires": ["b >= 1.0"]},
+        "2.0": {"requires": ["b < 2.0"]}
+      }
+    },
+    "b": {
+      "versions": {
+        "1.0": {},
+        "2.0": {"requires": ["a < 2.0"]}
+      }
+    }
   }
 }
